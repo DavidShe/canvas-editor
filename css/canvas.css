@@ -1,0 +1,76 @@
+body {
+    margin: 0px;
+    padding: 0px;
+}
+#main_canvas {
+    border: 1px solid #9C9898;
+    width: 600px;
+    height: 400px;
+    float: left;
+    margin: 10px;
+}
+.button{
+    float: left;
+    margin: 10px;
+}
+#tools_bar{
+    float: left;
+    width: 70px;
+}
+
+#main_canvas > canvas{
+    position: absolute;
+}
+
+#final_canvas{
+    display: none;
+}
+
+.layer{
+    position: absolute;
+}
+
+.resize{
+    display: none;
+}
+
+.selected > .resize{
+    display: block;
+}
+
+.resize{
+    width: 10px;
+    height: 10px;
+    border: 1px solid #000;
+    position: absolute;
+    background-color: #FFFFFF;
+}
+
+#selected_resize{
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    border: 1px solid #00DDFF;
+    background-color: #00DDFF;
+    display: none;
+}
+
+.rtl , .tl{
+    top: -5px;
+    left: -5px;
+}
+
+.rtr , .tr{
+    top: -5px;
+    right: -5px;
+}
+
+.rbl , .bl{
+    bottom: -5px;
+    left: -5px;
+}
+
+.rbr , .br{
+    bottom: -5px;
+    right: -5px;
+}

@@ -1,0 +1,286 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <link href="css/canvas.css" type="text/css" rel="stylesheet"/>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+        <script type="text/javascript">
+            
+            var layer = 0;
+            var canvases = {};
+            var last_layer = -1;
+            var selected_layer = -1;
+            $("document").ready(function(){
+                
+            });
+            
+            function canvas_click(layer_n){
+                selected_layer = layer_n;
+                if(selected_layer != last_layer){
+                    if(last_layer == -1){
+                        $('#layer_'+layer_n).css('z-index','9999');
+                        $('#layer_'+layer_n).children(".resize").css("display","block");
+                        last_layer = layer_n;
+                    }else{
+                        $('#layer_'+layer_n).css('z-index','9999');
+                        $('#layer_'+layer_n).children(".resize").css("display","block");
+                        $('#layer_'+last_layer).children(".resize").css("display","none");
+                        $('#layer_'+last_layer).css('z-index',last_layer);
+                        last_layer = layer_n;
+                    }
+                }
+            }
+            
+            var start_x = 0;
+            var start_y = 0;
+            var position_x = 0;
+            var position_y = 0;
+            var final_x = 0;
+            var final_y = 0 ;
+            var corner = '';
+            
+            function startResize(event, ui, c){
+                corner = c;
+                start_x = ui.position.left;
+                start_y = ui.position.top;
+                position_x = $('#layer_'+selected_layer).css("left");
+                position_y = $('#layer_'+selected_layer).css("top");
+                position_y = parseInt(position_y.substr(0, position_y.length-2));
+                position_x = parseInt(position_x.substr(0, position_x.length-2));
+                $('#layer_'+selected_layer).children("#selected_resize").addClass(corner);
+                $('#layer_'+selected_layer).children("#selected_resize").css("display","block");
+            }
+            
+            function dragResize(event, ui){
+                final_x = ui.position.left;
+                final_y = ui.position.top;
+                                
+                switch(corner){
+                    case 'rbr':
+                        $('#layer_'+selected_layer).children(".br").hide();
+                        resize_br();
+                        break;
+                    case 'rtr':
+                        $('#layer_'+selected_layer).children(".tr").hide();
+                        resize_tr();
+                        break;
+                    case 'rbl':
+                        $('#layer_'+selected_layer).children(".bl").hide();
+                        resize_bl();
+                        break;
+                    case 'rtl':
+                        $('#layer_'+selected_layer).children(".tl").hide();
+                        resize_tl();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
+            function resize_tl(){
+                var dx = (final_x - start_x);
+                var dy = (final_y - start_y);
+                canvases[selected_layer].context.save();
+                canvases[selected_layer].context.clearRect(0, 0, canvases[selected_layer].width, canvases[selected_layer].height);
+                canvases[selected_layer].context.restore();
+                $("#canvas_"+selected_layer).attr("width",canvases[selected_layer].width - dx);
+                $("#canvas_"+selected_layer).attr("height",canvases[selected_layer].height - dy);
+                canvases[selected_layer].context.drawImage(canvases[selected_layer].image, 0, 0,
+                canvases[selected_layer].width - dx,
+                canvases[selected_layer].height - dy);
+                
+                
+                $('#layer_'+selected_layer).css('width',canvases[selected_layer].width - dx);
+                $('#layer_'+selected_layer).css('height',canvases[selected_layer].height - dy);
+                
+                $('#layer_'+selected_layer).css("left", (position_x + dx));
+                $('#layer_'+selected_layer).css("top", (position_y + dy));
+                                
+            }
+            
+            function resize_bl(){
+                var dx = (final_x - start_x);
+                var dy = (final_y - start_y);
+                canvases[selected_layer].context.save();
+                canvases[selected_layer].context.clearRect(0, 0, canvases[selected_layer].width, canvases[selected_layer].height);
+                canvases[selected_layer].context.restore();
+                $("#canvas_"+selected_layer).attr("width",canvases[selected_layer].width - dx);
+                $("#canvas_"+selected_layer).attr("height",canvases[selected_layer].height + dy);
+                canvases[selected_layer].context.drawImage(canvases[selected_layer].image, 0, 0,
+                canvases[selected_layer].width - dx,
+                canvases[selected_layer].height + dy);
+                
+                
+                $('#layer_'+selected_layer).css('width',canvases[selected_layer].width - dx);
+                $('#layer_'+selected_layer).css('height',canvases[selected_layer].height + dy);
+                
+                $('#layer_'+selected_layer).css("left", (position_x + dx));
+                                
+            }
+            
+            function resize_tr(){
+                var dx = (final_x - start_x);
+                var dy = (final_y - start_y);
+                canvases[selected_layer].context.save();
+                canvases[selected_layer].context.clearRect(0, 0, canvases[selected_layer].width, canvases[selected_layer].height);
+                canvases[selected_layer].context.restore();
+                $("#canvas_"+selected_layer).attr("width",canvases[selected_layer].width + dx);
+                $("#canvas_"+selected_layer).attr("height",canvases[selected_layer].height - dy);
+                canvases[selected_layer].context.drawImage(canvases[selected_layer].image, 0, 0,
+                canvases[selected_layer].width + dx,
+                canvases[selected_layer].height - dy);
+                
+                
+                $('#layer_'+selected_layer).css('width',canvases[selected_layer].width + dx);
+                $('#layer_'+selected_layer).css('height',canvases[selected_layer].height - dy);
+                
+                $('#layer_'+selected_layer).css("top", (position_y + dy));
+                
+            }
+            
+            function resize_br(){
+                canvases[selected_layer].context.save();
+                canvases[selected_layer].context.clearRect(0, 0, canvases[selected_layer].width, canvases[selected_layer].height);
+                canvases[selected_layer].context.restore();
+                $("#canvas_"+selected_layer).attr("width",canvases[selected_layer].width + (final_x - start_x));
+                $("#canvas_"+selected_layer).attr("height",canvases[selected_layer].height + (final_y - start_y));
+                canvases[selected_layer].context.drawImage(canvases[selected_layer].image, 0, 0,
+                canvases[selected_layer].width + (final_x - start_x),
+                canvases[selected_layer].height + (final_y - start_y));
+                
+                $('#layer_'+selected_layer).css('width',canvases[selected_layer].width + (final_x - start_x));
+                $('#layer_'+selected_layer).css('height',canvases[selected_layer].height + (final_y - start_y));
+                
+            }
+            
+            function stopResize(event, ui){
+                switch(corner){
+                    case 'rbr':
+                        canvases[selected_layer].width = canvases[selected_layer].width + (final_x - start_x);
+                        canvases[selected_layer].height = canvases[selected_layer].height + (final_y - start_y);
+                        break;
+                    case 'rtr':
+                        canvases[selected_layer].width = canvases[selected_layer].width + (final_x - start_x);
+                        canvases[selected_layer].height = canvases[selected_layer].height - (final_y - start_y);
+                        break;
+                    case 'rbl':
+                        canvases[selected_layer].width = canvases[selected_layer].width - (final_x - start_x);
+                        canvases[selected_layer].height = canvases[selected_layer].height + (final_y - start_y);
+                        break;
+                    case 'rtl':
+                        canvases[selected_layer].width = canvases[selected_layer].width - (final_x - start_x);
+                        canvases[selected_layer].height = canvases[selected_layer].height - (final_y - start_y);
+                        break;
+                }
+                
+                $('#layer_'+selected_layer).children(".tr").css("top","-5px");
+                $('#layer_'+selected_layer).children(".tr").css("left","auto");
+                $('#layer_'+selected_layer).children(".tr").css("bottom","auto");
+                $('#layer_'+selected_layer).children(".tr").css("right","-5px");
+                $('#layer_'+selected_layer).children(".tr").show();
+                $('#layer_'+selected_layer).children(".br").css("bottom","-5px");
+                $('#layer_'+selected_layer).children(".br").css("left","auto");
+                $('#layer_'+selected_layer).children(".br").css("top","auto");
+                $('#layer_'+selected_layer).children(".br").css("right","-5px");
+                $('#layer_'+selected_layer).children(".br").show();
+                $('#layer_'+selected_layer).children(".bl").css("bottom","-5px");
+                $('#layer_'+selected_layer).children(".bl").css("left","-5px");
+                $('#layer_'+selected_layer).children(".bl").css("top","auto");
+                $('#layer_'+selected_layer).children(".bl").css("right","auto");
+                $('#layer_'+selected_layer).children(".bl").show();
+                $('#layer_'+selected_layer).children(".tl").css("bottom","auto");
+                $('#layer_'+selected_layer).children(".tl").css("left","-5px");
+                $('#layer_'+selected_layer).children(".tl").css("top","-5px");
+                $('#layer_'+selected_layer).children(".tl").css("right","auto");
+                $('#layer_'+selected_layer).children(".tl").show();
+                
+                $('#layer_'+selected_layer).children("#selected_resize").removeClass(corner);
+                $('#layer_'+selected_layer).children("#selected_resize").hide();
+            }
+            
+            function addCanvas(file){
+                //context.translate(250, -50);
+                //context.rotate(Math.PI / 4);
+                $("#main_canvas").append('<div class="layer" id="layer_'+layer+'" onclick="canvas_click(\''+layer+'\');" >\n\
+                <canvas id="canvas_'+layer+'"></canvas>\n\
+                <div class="resize tl" corner="rtl"></div>\n\
+                <div class="resize tr" corner="rtr"></div>\n\
+                <div class="resize bl" corner="rbl"></div>\n\
+                <div class="resize br" corner="rbr"></div>\n\
+                <div id="selected_resize"></div>\n\
+                </div>');
+                $('.resize').draggable({
+                    start: function( event, ui ) {
+                        startResize(event, ui, $(this).attr("corner"));
+                    },
+                    drag: function( event, ui ) {
+                        dragResize(event, ui);
+                    },
+                    stop: function( event, ui ) {
+                        stopResize(event, ui);
+                    }
+                });
+                $('#layer_'+layer).draggable();
+                $('#layer_'+layer).css('z-index',layer);
+                
+                var canvas = document.getElementById('canvas_'+layer);
+                
+                var context = canvas.getContext('2d');
+                var imageObj = new Image();
+                imageObj.src = 'http://localhost:8888/images/'+file;
+                
+                $('#canvas_'+layer).attr('width', imageObj.width*2);
+                $('#canvas_'+layer).attr('height', imageObj.height*2);
+                $('#layer_'+layer).css('width',imageObj.width);
+                $('#layer_'+layer).css('height',imageObj.height);
+                
+                imageObj.onload = function() {     
+                    context.drawImage(imageObj, imageObj.width / 2, imageObj.height / 2);
+                };
+                
+                var canvasobj = new Object();
+                canvasobj.image = imageObj;
+                canvasobj.context = context;
+                canvasobj.canvas = canvas;
+                canvasobj.width = imageObj.width;
+                canvasobj.height = imageObj.height;
+                canvases[layer] = canvasobj;
+                layer++;
+            }
+            function print() {
+                var finalcanvas = document.getElementById('final_canvas');
+                var finalcontext = finalcanvas.getContext('2d');
+                finalcontext.clearRect(0, 0, finalcanvas.width, finalcanvas.height);
+                finalcontext.restore();
+                for(i=0; i<layer; i++){
+                    var x = $("#layer_"+i).css('left');
+                    var y = $("#layer_"+i).css('top');
+                    x = x.substr(0,x.length-2);
+                    y = y.substr(0,y.length-2);
+                    finalcontext.drawImage(canvases[i].canvas, x, y);
+                }
+                //finalcontext.drawImage(imageObj, 0, 0);
+                var img    = finalcanvas.toDataURL("image/png");
+                $("#img").replaceWith('<div id="img"><img src="'+img+'" /></div>');
+            }
+        </script>
+    </head>
+    <body>
+        <div id="main_canvas">
+        </div>
+
+        <canvas id="final_canvas" width="600" height="400"></canvas>
+
+        <div id="tools_bar">
+            <div class="button" id="flower" onclick="addCanvas('flower.jpeg');">
+                <img src="/images/flower.jpeg" width="50" height="50">
+            </div>
+            <div class="button" id="print" onclick="print();">
+                <img src="icon/print.png" width="50" height="50">
+            </div>
+        </div>
+
+        <div id="img"></div>
+    </body>
+</html>

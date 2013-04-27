@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+      #myCanvas {
+        border: 1px solid #9C9898;
+      }
+    </style>
+     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="578" height="400"></canvas>
+    
+    <div id="img"></div>
+    <script>
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+      context.translate(250, -50);
+      context.rotate(Math.PI / 4);
+      var imageObj = new Image();
+
+      imageObj.onload = function() {
+        context.drawImage(imageObj, 69, 50);
+        var img    = canvas.toDataURL("image/png");
+        $("#img").append('<img src="'+img+'"/>');
+      };
+      imageObj.src = 'http://localhost/flower.jpeg';
+      
+      
+    </script>
+  </body>
+</html>
